@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  controller:
+    image: sgermonenko/meteor-controller
+    container_name: meteor__controller
+    environment:
+      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION}
+      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+    healthcheck:
+      test: "curl --fail http://localhost:3000/health || exit 1"
+      interval: 5s
+      start_period: 5s
+      timeout: 15s
+  employees:
+    image: sgermonenko/meteor-employees
+    container_name: meteor__employees
+    environment:
+      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
+      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+    depends_on:
+      controller:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail http://localhost:3000/health || exit 1"
+      interval: 5s
+      start_period: 5s
+      timeout: 15s
+  sessions:
+    image: sgermonenko/meteor-sessions
+    container_name: meteor__sessions
+    environment:
+      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
+      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+    depends_on:
+      controller:
+        condition: service_healthy
+      employees:
+        condition: service_healthy
+    healthcheck:
+      test: "curl --fail http://localhost:3000/health || exit 1"
+      interval: 5s
+      start_period: 5s
+      timeout: 15s
+  gateway:
+    image: sgermonenko/meteor-gateway
+    container_name: meteor__gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
+      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}

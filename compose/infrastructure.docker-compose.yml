@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  postgres_main:
+    image: "postgres:15-alpine"
+    container_name: "meteor__postgres_main"
+    hostname: "postgres-main"
+    ports:
+      - "5000:5432"
+    volumes:
+      - "postgres_main:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: ${METEOR_POSTGRES_MAIN_USER}
+      POSTGRES_PASSWORD: ${METEOR_POSTGRES_MAIN_PASSWORD}
+      POSTGRES_DB: controller
+  postgres_customers_cluster:
+    image: "postgres:15-alpine"
+    container_name: "meteor__postgres_customers_cluster"
+    hostname: "postgres-customers-cluster"
+    ports:
+      - "5001:5432"
+    volumes:
+      - "postgres_customers_cluster:/var/lib/postgresql/data"
+    environment:
+      POSTGRES_USER: ${METEOR_POSTGRES_CUSTOMERS_USER}
+      POSTGRES_PASSWORD: ${METEOR_POSTGRES_CUSTOMERS_PASSWORD}
+      POSTGRES_DB: postgres
+
+volumes:
+  postgres_main:
+    name: "meteor__postgres_main"
+  postgres_customers_cluster:
+    name: "meteor__postgres_customers_cluster"
