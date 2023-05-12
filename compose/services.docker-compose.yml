@@ -4,9 +4,11 @@ services:
   controller:
     image: sgermonenko/meteor-controller
     container_name: meteor__controller
+    ports:
+      - "3001:3001"
     environment:
-      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION}
-      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+      - ConnectionStrings__AzureAppConfiguration=${METEOR_AZURE_APP_CONFIGURATION}
+      - ASPNETCORE_ENVIRONMENT=${METEOR_ENVIRONMENT}
     healthcheck:
       test: "curl --fail http://localhost:3000/health || exit 1"
       interval: 5s
@@ -16,8 +18,8 @@ services:
     image: sgermonenko/meteor-employees
     container_name: meteor__employees
     environment:
-      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
-      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+      - ConnectionStrings__AzureAppConfiguration=${METEOR_AZURE_APP_CONFIGURATION}
+      - ASPNETCORE_ENVIRONMENT=${METEOR_ENVIRONMENT}
     depends_on:
       controller:
         condition: service_healthy
@@ -30,8 +32,8 @@ services:
     image: sgermonenko/meteor-sessions
     container_name: meteor__sessions
     environment:
-      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
-      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+      - ConnectionStrings__AzureAppConfiguration=${METEOR_AZURE_APP_CONFIGURATION}
+      - ASPNETCORE_ENVIRONMENT=${METEOR_ENVIRONMENT}
     depends_on:
       controller:
         condition: service_healthy
@@ -42,6 +44,12 @@ services:
       interval: 5s
       start_period: 5s
       timeout: 15s
+  search:
+    image: sgermonenko/meteor-search
+    container_name: meteor__search
+    environment:
+      - ConnectionStrings__AzureAppConfiguration=${METEOR_AZURE_APP_CONFIGURATION}
+      - ASPNETCORE_ENVIRONMENT=${METEOR_ENVIRONMENT}
   gateway:
     image: sgermonenko/meteor-gateway
     container_name: meteor__gateway
@@ -49,5 +57,5 @@ services:
       - "80:80"
       - "443:443"
     environment:
-      ConnectionStrings__AzureAppConfiguration: ${METEOR_AZURE_APP_CONFIGURATION} 
-      ASPNETCORE_ENVIRONMENT: ${METEOR_ENVIRONMENT}
+      - ConnectionStrings__AzureAppConfiguration=${METEOR_AZURE_APP_CONFIGURATION}
+      - ASPNETCORE_ENVIRONMENT=${METEOR_ENVIRONMENT}
